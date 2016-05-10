@@ -1,6 +1,6 @@
-name         'emyl-vagrant'
+name         'tkh-vagrant'
 version      '0.1.0'
-author       'Emiliano Ticci'
+author       'Emiliano Ticci (emyl-vagrant), st01tkh'
 license      'MIT'
 summary      'Install vagrant and, optionally, vagrant boxes and plugins'
 description  "
@@ -15,4 +15,4 @@ Works on all the platforms supported by vagrant:
 
 Vagrant is a tool for building and distributing development environments.
 "
-project_page 'https://github.com/emyl/puppet-vagrant'
+project_page 'https://github.com/st01tkh/puppet-vagrant'
