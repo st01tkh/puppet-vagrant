@@ -49,9 +49,10 @@ class vagrant($version = get_latest_vagrant_version()) {
 
   # Determine the base url (it depends on the version)
   if versioncmp($version, '1.4.0') >= 0 {
-    $base_url       = 'https://dl.bintray.com/mitchellh/vagrant'
+    $base_url       = "https://releases.hashicorp.com/vagrant/${version}"
     $darwin_prefix  = 'vagrant_'
     $windows_prefix = 'vagrant_'
+    $vagrant_sha256sums_source = "${base_url}/vagrant_${version}_SHA256SUMS"
   } else {
     $base_url = "http://files.vagrantup.com/packages/${old_versions[$version]}"
     $darwin_prefix  = 'Vagrant-'
@@ -59,6 +60,7 @@ class vagrant($version = get_latest_vagrant_version()) {
   }
 
   # Finally determine download url and provider
+   
   case $::operatingsystem {
     centos, redhat, fedora: {
       case $::architecture {
@@ -84,10 +86,12 @@ class vagrant($version = get_latest_vagrant_version()) {
         x86_64, amd64: {
           $vagrant_filename = "vagrant_${version}_x86_64.deb"
           $vagrant_provider = 'dpkg'
+          $vagrant_sha256sums_cmd_sed = "/bin/sed -rn 's/([0-9a-z]+)(.*_x86_64.deb)/\\\\1/p'"
         }
         i386: {
           $vagrant_filename = "vagrant_${version}_i686.deb"
           $vagrant_provider = 'dpkg'
+          $vagrant_sha256sums_cmd_sed = "/bin/sed -rn 's/([0-9a-z]+)(.*_686.deb)/\\\\1/p'"
         }
         default: {
           fail("Unrecognized architecture: ${::architecture}")
@@ -95,11 +99,13 @@ class vagrant($version = get_latest_vagrant_version()) {
       }
 
       $vagrant_source = "${::ostempdir}/${vagrant_filename}"
-
+      $vagrant_sha256sums_cmd = "[ -e $vagrant_source ] && [ `sha256sum $vagrant_source | cut -d ' ' -f1` = `/usr/bin/wget -q -O - $vagrant_sha256sums_source | $vagrant_sha256sums_cmd_sed` ] && echo OK && touch /tmp/CHECK_OK"
       exec { 'vagrant-download':
-        command => "/usr/bin/wget -O ${vagrant_source} ${base_url}/${vagrant_filename}",
-        creates => $vagrant_source,
-        timeout => 0,
+        command => "touch /tmp/DOWNLOAD && /usr/bin/wget -O ${vagrant_source} ${base_url}/${vagrant_filename}",
+	path => ['/bin', '/usr/bin'],
+	unless => $vagrant_sha256sums_cmd,
+        #creates => $vagrant_source,
+        #timeout => 1000,
         before  => Package["vagrant-${version}"]
       }
     }
