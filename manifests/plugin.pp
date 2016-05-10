@@ -13,8 +13,8 @@
 #
 define vagrant::plugin(
   $plugin_name    = $title,
-  $user           = $::id
-  $plugin_version = undef,
+  $user           = $::id,
+  $plugin_version = undef
 ) {
   include vagrant::params
 
@@ -26,7 +26,8 @@ define vagrant::plugin(
     $plugin_unless = "${vagrant::params::binary} plugin list | ${vagrant::params::grep} \"^${plugin_name}\s(${plugin_version})\""
   }
 
-  vagrant::command { "${vagrant::params::binary} plugin install ${plugin_name}":
+  vagrant::command { "Install vagrant plugin ${plugin_name} for user ${user}":
+    command => $plugin_command,
     unless => $plugin_unless,
     user   => $user,
   }
