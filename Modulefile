@@ -1,5 +1,5 @@
 name         'tkh-vagrant'
-version      '0.1.0'
+version      '0.1.1'
 author       'Emiliano Ticci (emyl-vagrant), st01tkh'
 license      'MIT'
 summary      'Install vagrant and, optionally, vagrant boxes and plugins'
