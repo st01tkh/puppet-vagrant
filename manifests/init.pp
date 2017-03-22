@@ -62,13 +62,13 @@ class vagrant($version = get_latest_vagrant_version()) {
   # Finally determine download url and provider
    
   case $::operatingsystem {
-    centos, redhat, fedora: {
+    'centos', 'redhat', 'fedora': {
       case $::architecture {
-        x86_64, amd64: {
+        'x86_64', 'amd64': {
           $vagrant_source = "${base_url}/vagrant_${version}_x86_64.rpm"
           $vagrant_provider = 'rpm'
         }
-        i386: {
+        'i386': {
           $vagrant_source = "${base_url}/vagrant_${version}_i686.rpm"
           $vagrant_provider = 'rpm'
         }
@@ -77,18 +77,18 @@ class vagrant($version = get_latest_vagrant_version()) {
         }
       }
     }
-    Darwin: {
+    'Darwin': {
       $vagrant_source   = "${base_url}/${darwin_prefix}${version}.dmg"
       $vagrant_provider = 'pkgdmg'
     }
-    debian, ubuntu, linuxmint: {
+    'debian', 'ubuntu', 'linuxmint': {
       case $::architecture {
-        x86_64, amd64: {
+        'x86_64', 'amd64': {
           $vagrant_filename = "vagrant_${version}_x86_64.deb"
           $vagrant_provider = 'dpkg'
           $vagrant_sha256sums_cmd_sed = "/bin/sed -rn 's/([0-9a-z]+)(.*_x86_64.deb)/\\\\1/p'"
         }
-        i386: {
+        'i386': {
           $vagrant_filename = "vagrant_${version}_i686.deb"
           $vagrant_provider = 'dpkg'
           $vagrant_sha256sums_cmd_sed = "/bin/sed -rn 's/([0-9a-z]+)(.*_686.deb)/\\\\1/p'"
@@ -109,7 +109,7 @@ class vagrant($version = get_latest_vagrant_version()) {
         before  => Package["vagrant-${version}"]
       }
     }
-    windows: {
+    'windows': {
       $vagrant_filename = "${windows_prefix}${version}.msi"
       $vagrant_source   = "${::ostempdir}\\${vagrant_filename}"
       $vagrant_provider = 'windows'
