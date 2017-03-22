@@ -4,12 +4,12 @@
 #
 class vagrant::params {
   case $::kernel {
-    Darwin: {
+    'Darwin': {
       $binary = '/usr/bin/vagrant'
       $grep   = '/usr/bin/grep -i'
       $su     = '/usr/bin/su'
     }
-    windows: {
+    'windows': {
       $binary = 'C:\HashiCorp\Vagrant\bin\vagrant.exe'
       $grep   = 'C:\Windows\System32\findstr.exe /I'
     }
