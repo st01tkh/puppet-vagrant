@@ -25,8 +25,32 @@ define vagrant::plugin(
     $plugin_command = "${vagrant::params::binary} plugin install ${plugin_name} --plugin-version ${plugin_version}"
     $plugin_unless = "${vagrant::params::binary} plugin list | ${vagrant::params::grep} \"^${plugin_name}\s(${plugin_version})\""
   }
+   
+  $vagrant_cmd_title = "Install vagrant plugin ${plugin_name} for user ${user}"
 
-  vagrant::command { "Install vagrant plugin ${plugin_name} for user ${user}":
+  case $facts['kernel'] {
+    'Linux' : {
+      case $facts['os']['family'] {
+        'RedHat', 'Amazon' : {
+          ensure_packages(['gcc', 'gcc-c++', 'kernel-devel', 'make'], {
+            'ensure' => 'present',
+            'before' => Vagrant::Command[$vagrant_cmd_title],
+          })
+        }
+        'Debian', 'Ubuntu' : {
+          ensure_packages(['build-essential'], {
+            'ensure' => 'present',
+            'before' => Vagrant::Command[$vagrant_cmd_title],
+          })
+        }
+      }
+    }
+    default : {
+      fail ("unsupported platform ${$facts['os']['name']}")
+    }
+  }
+
+  vagrant::command { $vagrant_cmd_title:
     command => $plugin_command,
     unless => $plugin_unless,
     user   => $user,
